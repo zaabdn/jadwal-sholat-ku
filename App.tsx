@@ -6,7 +6,7 @@
  */
 
 import HomeScreen from "./src/screens/home";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import type { PropsWithChildren } from "react";
 import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, useColorScheme, View } from "react-native";
 
@@ -17,6 +17,7 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from "react-native/Libraries/NewAppScreen";
+import { connectToDatabase, createDatabases } from "./src/db/db";
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -54,6 +55,19 @@ function App(): React.JSX.Element {
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+
+  const loadData = useCallback(async () => {
+    try {
+      const db = await connectToDatabase();
+      await createDatabases(db);
+    } catch (error) {
+      console.log("loadData", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   return (
     <SafeAreaView style={backgroundStyle}>
