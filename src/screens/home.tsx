@@ -32,7 +32,6 @@ const HomeScreen = () => {
     fetch(`https://api.myquran.com/v2/sholat/jadwal/${city}/2024-08-06`)
       .then((res) => res.json())
       .then((result) => {
-        // setCity(result.data);
         setScheduleSholat(result.data);
       })
       .catch((err) => console.log("err", err));
@@ -71,18 +70,18 @@ const HomeScreen = () => {
         </View>
       )}
 
-      <SwipeablePanel
+      {/* <SwipeablePanel
         isActive={showCity}
         onClose={() => setShowCity(false)}
         closeOnTouchOutside={true}
         fullWidth={true}>
-        {/* <ListCity /> */}
-        {/* {city.map((item) => (
+        <ListCity />
+        {city.map((item) => (
           <TouchableOpacity key={item.id} style={{ marginHorizontal: 20, marginTop: 10 }}>
             <Text>{item.lokasi}</Text>
           </TouchableOpacity>
-        ))} */}
-      </SwipeablePanel>
+        ))}
+      </SwipeablePanel> */}
     </SafeAreaView>
   );
 };
