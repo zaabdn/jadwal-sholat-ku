@@ -17,36 +17,24 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from "react-native/Libraries/NewAppScreen";
-import { connectToDatabase, createDatabases } from "./src/db/db";
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+import firebase from "@react-native-firebase/app";
 
-function Section({ children, title }: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === "dark";
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+import { FIREBASE_APPID, FIREBASE_KEY, FIREBASE_DATABASE_URL } from "@env";
+
+const firebaseConfig = {
+  apiKey: FIREBASE_KEY,
+  // authDomain: "jadwalsholatku-34989.firebaseapp.com",
+  projectId: "jadwalsholatku-34989",
+  storageBucket: "jadwalsholatku-34989.appspot.com",
+  messagingSenderId: "799034507658",
+  appId: FIREBASE_APPID,
+  measurementId: "",
+  databaseURL: FIREBASE_DATABASE_URL,
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
 }
 
 function App(): React.JSX.Element {
@@ -56,18 +44,18 @@ function App(): React.JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  const loadData = useCallback(async () => {
-    try {
-      const db = await connectToDatabase();
-      await createDatabases(db);
-    } catch (error) {
-      console.log("loadData", error);
-    }
-  }, []);
+  // const loadData = useCallback(async () => {
+  //   try {
+  //     const db = await connectToDatabase();
+  //     await createDatabases(db);
+  //   } catch (error) {
+  //     console.log("loadData", error);
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  // useEffect(() => {
+  //   loadData();
+  // }, []);
 
   return (
     <SafeAreaView style={backgroundStyle}>

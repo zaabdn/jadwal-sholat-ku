@@ -1,3 +1,4 @@
+import { COLORS } from "../utils/colors";
 import React from "react";
 import { Dimensions } from "react-native";
 import { FlexWidget, IconWidget, ListWidget, TextWidget } from "react-native-android-widget";
@@ -31,7 +32,7 @@ const ListScheduleWidget = () => {
       style={{
         height: 100,
         width: "match_parent",
-        backgroundColor: "#1F3529",
+        backgroundColor: "#528974",
         alignItems: "center",
         flexDirection: "row",
         justifyContent: "space-between",
@@ -46,7 +47,7 @@ const ListScheduleWidget = () => {
         }}>
         <FlexWidget
           style={{
-            backgroundColor: "#1F3529",
+            backgroundColor: "#528974",
             alignItems: "center",
             flexDirection: "row",
             justifyContent: "space-between",
@@ -55,7 +56,7 @@ const ListScheduleWidget = () => {
           {data.map((_, i) => (
             <FlexWidget
               style={{
-                width: Dimensions.get("screen").width / 5.7,
+                width: (Dimensions.get("screen").width - 40) / 5,
                 // backgroundColor: "#4D6357",
                 alignItems: "center",
                 flexDirection: "row",
@@ -73,6 +74,7 @@ const ListScheduleWidget = () => {
               <FlexWidget
                 style={{
                   flexDirection: "column",
+                  alignItems: "center",
                 }}>
                 <TextWidget
                   text={_.name}
@@ -81,6 +83,7 @@ const ListScheduleWidget = () => {
                     color: "#ffffff",
                     fontWeight: "500",
                     fontFamily: "Roboto",
+                    textAlign: "center",
                   }}
                 />
                 <TextWidget
@@ -89,6 +92,7 @@ const ListScheduleWidget = () => {
                     fontSize: 12,
                     color: "#ffffff",
                     fontFamily: "Roboto",
+                    textAlign: "center",
                   }}
                 />
               </FlexWidget>

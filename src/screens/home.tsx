@@ -4,27 +4,34 @@ import { Dimensions, FlatList, SafeAreaView, Text, TextInput, TouchableOpacity, 
 
 import { WidgetPreview } from "react-native-android-widget";
 import ListScheduleWidget from "../widgets/ListScheduleWidget";
+import { getLocation } from "../db/db";
+import { firebase } from "@react-native-firebase/database";
 
 const HomeScreen = () => {
-  const [city, setCity] = useState([]);
+  const [listCity, setListCity] = useState([]);
   const [showCity, setShowCity] = useState(false);
   const [scheduleSholat, setScheduleSholat] = useState(null);
+  const [city, setCity] = useState<number>(0);
 
   const fetchAllCity = () => {
     fetch("https://api.myquran.com/v2/sholat/kota/cari/jakarta")
       .then((res) => res.json())
       .then((result) => {
-        setCity(result.data);
-        fetchScheduleSholat();
+        setListCity(result.data);
       })
       .catch((err) => console.log("err", err));
   };
 
+  const fetchLocation = async () => {
+    const location = await getLocation();
+
+    setCity(location.cityCode);
+  };
+
   const fetchScheduleSholat = () => {
-    fetch(`https://api.myquran.com/v2/sholat/jadwal/${city?.[0]?.id}/2024-08-06`)
+    fetch(`https://api.myquran.com/v2/sholat/jadwal/${city}/2024-08-06`)
       .then((res) => res.json())
       .then((result) => {
-        console.log("fetchScheduleSholat", result);
         // setCity(result.data);
         setScheduleSholat(result.data);
       })
@@ -33,18 +40,19 @@ const HomeScreen = () => {
 
   useEffect(() => {
     fetchAllCity();
+    fetchLocation();
+    fetchScheduleSholat();
   }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, height: Dimensions.get("screen").height }}>
-      <WidgetPreview
-        renderWidget={() => <ListScheduleWidget />}
-        onClick={(props) => {}}
-        height={150}
-        width={Dimensions.get("screen").width - 20}
-      />
-
       <View style={{ marginHorizontal: 20, marginTop: 20 }}>
+        <WidgetPreview
+          renderWidget={() => <ListScheduleWidget />}
+          onClick={(props) => {}}
+          height={150}
+          width={Dimensions.get("window").width - 40}
+        />
         <TouchableOpacity onPress={() => setShowCity(true)} style={{ padding: 10, borderWidth: 1, borderRadius: 10 }}>
           <Text>City</Text>
         </TouchableOpacity>
