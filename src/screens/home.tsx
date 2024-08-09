@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   FlatList,
+  Image,
   SafeAreaView,
   ScrollView,
   Text,
@@ -14,7 +15,7 @@ import {
 import { WidgetPreview } from "react-native-android-widget";
 import ListScheduleWidget from "../widgets/ListScheduleWidget";
 import { getLocation } from "../db/db";
-import { firebase } from "@react-native-firebase/database";
+
 import { COLORS } from "../utils/colors";
 
 type CityProps = {
@@ -26,8 +27,8 @@ const HomeScreen = () => {
   const [listCity, setListCity] = useState([]);
   const [showCity, setShowCity] = useState(false);
   const [scheduleSholat, setScheduleSholat] = useState(null);
-  const [city, setCity] = useState<number>(0);
-  const [selectedCity, setSelectedCity] = useState({ name: "", id: "" });
+  const [selectedCity, setSelectedCity] = useState<CityProps>({ name: "", id: "" });
+  const [search, setSearch] = useState<string>("");
 
   const fetchAllCity = () => {
     fetch("https://api.myquran.com/v2/sholat/kota/semua")
@@ -41,13 +42,14 @@ const HomeScreen = () => {
   const fetchLocation = async () => {
     const location = await getLocation();
 
-    setCity(location.cityCode);
+    setSelectedCity({ id: location.cityCode, name: "" });
   };
 
   const fetchScheduleSholat = () => {
-    fetch(`https://api.myquran.com/v2/sholat/jadwal/${city}/2024-08-06`)
+    fetch(`https://api.myquran.com/v2/sholat/jadwal/${parseInt(selectedCity.id)}/2024-08-06`)
       .then((res) => res.json())
       .then((result) => {
+        console.log("schedule", result.data);
         setScheduleSholat(result.data);
       })
       .catch((err) => console.log("err", err));
@@ -56,11 +58,44 @@ const HomeScreen = () => {
   useEffect(() => {
     fetchAllCity();
     fetchLocation();
-    fetchScheduleSholat();
   }, []);
+
+  useEffect(() => {
+    fetchScheduleSholat();
+  }, [selectedCity]);
+
+  const handleSearch = (input: string) => {
+    setSearch(input);
+
+    if (!!input) {
+      setTimeout(() => {
+        fetch(`https://api.myquran.com/v2/sholat/kota/cari/${input}`)
+          .then((res) => res.json())
+          .then((result) => {
+            setListCity(result.data);
+          })
+          .catch((err) => console.log("err", err));
+      }, 1000);
+    }
+  };
 
   return (
     <SafeAreaView style={{ height: Dimensions.get("screen").height }}>
+      <View style={{ marginTop: 20, marginHorizontal: 20 }}>
+        <TouchableHighlight
+          onPress={() => {
+            setShowCity(true);
+          }}
+          style={{ borderRadius: 24, backgroundColor: COLORS.BLACK, padding: 10, width: "36%" }}>
+          <View style={{ flexDirection: "row" }}>
+            <Image source={require("../assets/icons/location.png")} style={{ width: 24, height: 24, marginRight: 3 }} />
+            <Text style={{ color: COLORS.WHITE }} numberOfLines={1}>
+              {!!selectedCity.name ? selectedCity.name : "Select City"}
+            </Text>
+          </View>
+        </TouchableHighlight>
+      </View>
+
       <View style={{ marginHorizontal: 20, marginTop: 20 }}>
         <WidgetPreview
           renderWidget={() => <ListScheduleWidget />}
@@ -68,16 +103,6 @@ const HomeScreen = () => {
           height={150}
           width={Dimensions.get("window").width - 40}
         />
-      </View>
-
-      <View style={{ marginTop: 20, marginHorizontal: 20 }}>
-        <TouchableHighlight
-          onPress={() => {
-            setShowCity(true);
-          }}
-          style={{ borderRadius: 10, backgroundColor: COLORS.PRIMARY, padding: 10 }}>
-          <Text style={{ color: "black" }}>{selectedCity.name}</Text>
-        </TouchableHighlight>
       </View>
 
       <BottomSheet isVisible={showCity} onClose={() => setShowCity(false)}>
@@ -89,10 +114,11 @@ const HomeScreen = () => {
               borderTopLeftRadius: 20,
               borderTopRightRadius: 20,
             }}>
-            <TextInput placeholder="Cari.." />
+            <TextInput placeholder="Cari.." value={search} onChangeText={handleSearch} />
 
             {listCity.slice(0, 30).map((item, i) => (
               <TouchableHighlight
+                underlayColor={COLORS.PRIMARY}
                 onPress={() => {
                   setSelectedCity({ id: item.id, name: item.lokasi });
                   setShowCity(false);
