@@ -1,20 +1,36 @@
-import { SwipeablePanel } from "../components/swipeable";
+import BottomSheet from "../components/swipeable";
 import React, { useEffect, useState } from "react";
-import { Dimensions, FlatList, SafeAreaView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Dimensions,
+  FlatList,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableHighlight,
+  View,
+} from "react-native";
 
 import { WidgetPreview } from "react-native-android-widget";
 import ListScheduleWidget from "../widgets/ListScheduleWidget";
 import { getLocation } from "../db/db";
 import { firebase } from "@react-native-firebase/database";
+import { COLORS } from "../utils/colors";
+
+type CityProps = {
+  id: string;
+  name: string;
+};
 
 const HomeScreen = () => {
   const [listCity, setListCity] = useState([]);
   const [showCity, setShowCity] = useState(false);
   const [scheduleSholat, setScheduleSholat] = useState(null);
   const [city, setCity] = useState<number>(0);
+  const [selectedCity, setSelectedCity] = useState({ name: "", id: "" });
 
   const fetchAllCity = () => {
-    fetch("https://api.myquran.com/v2/sholat/kota/cari/jakarta")
+    fetch("https://api.myquran.com/v2/sholat/kota/semua")
       .then((res) => res.json())
       .then((result) => {
         setListCity(result.data);
@@ -44,7 +60,7 @@ const HomeScreen = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, height: Dimensions.get("screen").height }}>
+    <SafeAreaView style={{ height: Dimensions.get("screen").height }}>
       <View style={{ marginHorizontal: 20, marginTop: 20 }}>
         <WidgetPreview
           renderWidget={() => <ListScheduleWidget />}
@@ -52,36 +68,49 @@ const HomeScreen = () => {
           height={150}
           width={Dimensions.get("window").width - 40}
         />
-        <TouchableOpacity onPress={() => setShowCity(true)} style={{ padding: 10, borderWidth: 1, borderRadius: 10 }}>
-          <Text>City</Text>
-        </TouchableOpacity>
       </View>
 
-      {!!scheduleSholat && (
-        <View>
-          <View>
-            <Text>Subuh: {scheduleSholat?.jadwal?.subuh}</Text>
-            <Text>Dhuha: {scheduleSholat?.jadwal?.dhuha}</Text>
-            <Text>Dzuhur: {scheduleSholat?.jadwal?.dzuhur}</Text>
-            <Text>Ashar: {scheduleSholat?.jadwal?.ashar}</Text>
-            <Text>Maghrib: {scheduleSholat?.jadwal?.maghrib}</Text>
-            <Text>Isya: {scheduleSholat?.jadwal?.isya}</Text>
-          </View>
-        </View>
-      )}
+      <View style={{ marginTop: 20, marginHorizontal: 20 }}>
+        <TouchableHighlight
+          onPress={() => {
+            setShowCity(true);
+          }}
+          style={{ borderRadius: 10, backgroundColor: COLORS.PRIMARY, padding: 10 }}>
+          <Text style={{ color: "black" }}>{selectedCity.name}</Text>
+        </TouchableHighlight>
+      </View>
 
-      {/* <SwipeablePanel
-        isActive={showCity}
-        onClose={() => setShowCity(false)}
-        closeOnTouchOutside={true}
-        fullWidth={true}>
-        <ListCity />
-        {city.map((item) => (
-          <TouchableOpacity key={item.id} style={{ marginHorizontal: 20, marginTop: 10 }}>
-            <Text>{item.lokasi}</Text>
-          </TouchableOpacity>
-        ))}
-      </SwipeablePanel> */}
+      <BottomSheet isVisible={showCity} onClose={() => setShowCity(false)}>
+        <ScrollView>
+          <View
+            style={{
+              marginHorizontal: 20,
+              marginTop: 20,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+            }}>
+            <TextInput placeholder="Cari.." />
+
+            {listCity.slice(0, 30).map((item, i) => (
+              <TouchableHighlight
+                onPress={() => {
+                  setSelectedCity({ id: item.id, name: item.lokasi });
+                  setShowCity(false);
+                }}
+                key={i}
+                style={{
+                  paddingVertical: 10,
+                  paddingLeft: 5,
+                  marginTop: 10,
+                  backgroundColor: selectedCity.id == item.id ? COLORS.PRIMARY : COLORS.BACKGROUND,
+                  borderRadius: 6,
+                }}>
+                <Text style={{ color: selectedCity.id == item.id ? COLORS.WHITE : COLORS.BLACK }}>{item.lokasi}</Text>
+              </TouchableHighlight>
+            ))}
+          </View>
+        </ScrollView>
+      </BottomSheet>
     </SafeAreaView>
   );
 };

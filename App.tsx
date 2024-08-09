@@ -7,7 +7,7 @@
 
 import HomeScreen from "./src/screens/home";
 import React, { useCallback, useEffect } from "react";
-import type { PropsWithChildren } from "react";
+
 import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, useColorScheme, View } from "react-native";
 
 import {
@@ -20,10 +20,10 @@ import {
 
 import firebase from "@react-native-firebase/app";
 
-import { FIREBASE_APPID, FIREBASE_KEY, FIREBASE_DATABASE_URL } from "@env";
+import { FIREBASE_APPID, FIREBASE_APIKEY, FIREBASE_DATABASE_URL } from "@env";
 
 const firebaseConfig = {
-  apiKey: FIREBASE_KEY,
+  apiKey: FIREBASE_APIKEY,
   // authDomain: "jadwalsholatku-34989.firebaseapp.com",
   projectId: "jadwalsholatku-34989",
   storageBucket: "jadwalsholatku-34989.appspot.com",
@@ -65,24 +65,7 @@ function App(): React.JSX.Element {
       />
       {/* <ScrollView contentInsetAdjustmentBehavior="automatic" style={backgroundStyle}> */}
       <HomeScreen />
-      {/* <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this screen and then come back to see your
-            edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">Read the docs to discover what to do next:</Section>
-          <LearnMoreLinks />
-        </View> */}
+
       {/* </ScrollView> */}
     </SafeAreaView>
   );
